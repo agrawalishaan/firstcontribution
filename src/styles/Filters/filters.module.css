@@ -1,0 +1,32 @@
+.filters {
+  align-items: center;
+  display: flex;
+  justify-content: center;
+  padding: 20px;
+  margin-bottom: 40px;
+}
+
+.filter-toggle {
+  background-color: #EFEFEF;
+  border: none;
+  border-radius: 30px;
+  /* set to dimensions of the view buttons */
+  height: 48px;
+  width: 48px;
+}
+
+.view {
+  background-color: transparent;
+  border-radius: 15px;
+  border: none;
+  color: #72717E;
+  font-weight: 300;
+  margin: 0 20px;
+  padding: 15px;
+}
+
+.active {
+  background-color: #f5f5f5;
+  color: #0D0D22;
+  font-weight: 600;
+}

@@ -1,4 +1,4 @@
-const RESULTS_PER_PAGE = 5;
+const RESULTS_PER_PAGE = 100;
 // stars>1000 is needed so github can reduce the amount of data searched, meaning the query finishes within their time limit, meaning we get consistent results
 const TOP_REPOS_BY_STARS_ENDPOINT = `https://api.github.com/search/repositories?q=stars:>1000&sort=stars&per_page=${RESULTS_PER_PAGE}`;
 
@@ -12,7 +12,10 @@ const TOP_REPOS_BY_STARS_ENDPOINT = `https://api.github.com/search/repositories?
 
 // on github repos, some languages are not actually programming languages, and we only want repos to show where users can make contributions in actual langages, this variable stores invalid languages that we want to filter out
 const INVALID_PROGRAMMING_LANGUAGES = ['Markdown'];
-export default {
+
+const constants = {
   INVALID_PROGRAMMING_LANGUAGES,
   TOP_REPOS_BY_STARS_ENDPOINT,
 };
+
+export default constants;

@@ -1,29 +1,44 @@
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
+
+import axios from 'axios';
+
 import CardContainer from '@/components/CardContainer/CardContainer';
-import FilterMenu from '@/components/FilterMenu/FilterMenu';
+import Filters from '@/components/Filters/Filters';
+import Infobar from '@/components/Infobar/Infobar';
 import Layout from '@/components/Layout/Layout';
 
-import styles from '@/styles/Homepage/index.module.css';
-
 export default function HomePage() {
+  // useStates
+
+  // controls what type of repos are viewed
+  const [view, setView] = useState('top');
+  // contains all repo information
   const [reposData, setReposData] = useState(null);
 
+  // useEffects
+
   useEffect(() => {
-    fetch('/exampleData.json')
+    axios
+      .get('/api/get-repos')
       .then((res) => {
-        return res.json();
+        setReposData(res.data);
       })
-      .then((data) => {
-        setReposData(data);
+      .catch((e) => {
+        console.error(e);
       });
   }, []);
 
+  // useCallbacks
+  // ! make it so when you click on a button already clicked nothing happens
+  const handleViewChange = useCallback(() => {
+    setView(view === 'top' ? 'community' : 'top');
+  }, [view]);
+
   return (
-    <Layout>
-      <div className={styles['homepage']}>
-        <FilterMenu />
-        {reposData && <CardContainer reposData={reposData} />}
-      </div>
+    <Layout title="First Contribution">
+      <Infobar />
+      <Filters view={view} handleViewChange={handleViewChange} />
+      <div>{reposData && <CardContainer reposData={reposData} />}</div>
     </Layout>
   );
 }

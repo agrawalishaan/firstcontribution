@@ -1,0 +1,7 @@
+.infobar {
+  background-color: #0051FE;
+  color: #FFF;
+  display: flex;
+  flex-direction: column;
+  height: 200px;
+}

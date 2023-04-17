@@ -1,55 +1,52 @@
-import { PrismaClient } from '@prisma/client';
+// ! use native Repository typing and LanguageRow typing
+import { PrismaClient, Repository } from '@prisma/client';
 const prisma = new PrismaClient();
 
-import constructLanguageRows from '@/lib//helpers/constructLanguageRows';
-import getTopReposByStars from '@/lib/helpers/getTopReposByStars';
-import validateLanguages from '@/lib/helpers/validateLanguages';
+import {
+  constructLanguageRows,
+  processAllRepos,
+} from '@/lib/util/constructLanguageRows';
+import { getTopReposByStars } from '@/lib/util/getTopReposByStars';
+import validateLanguages from '@/lib/util/validateLanguages';
 
 // npm run startdb
 async function main() {
   // ! clear all repos before seeding
+  await prisma.repositoryLanguage.deleteMany();
   await prisma.repository.deleteMany();
   console.log('all repos deleted');
-  await prisma.repositoryLanguage.deleteMany();
   console.log('all repo languages deleted');
 
-  // get data from helper functions that invoke API
   const repos = await getTopReposByStars();
-  const languageRows = await constructLanguageRows(repos);
-  // now that we have the top repos and their respective languages, we need to create a set of IDs representing valid repos, since we want to filter out repos that don't meet certain language criteria
+  // don't fully unroll the repos yet into individual language rows, as we want to filter out repos that don't meet certain language criteria
+  const processedRepos = await processAllRepos(repos);
   const validIds = new Set();
-  languageRows.forEach((languageInfo) => {
-    if (validateLanguages(languageInfo.languages)) {
-      validIds.add(languageInfo.repositoryId);
+  processedRepos.forEach((repo) => {
+    if (validateLanguages(repo.languages)) {
+      validIds.add(repo.repositoryId);
     }
   });
-  // now that we have a set of valid ids, we can filter out the repos that don't meet the criteria
+  // now build the prisma language rows and filter the repos and language rows
+  const languageRows = await constructLanguageRows(processedRepos);
   const filteredRepos = repos.filter((repo) => validIds.has(repo.repoId));
   const filteredLanguageRows = languageRows.filter((languageInfo) =>
     validIds.has(languageInfo.repositoryId)
   );
-  console.log('the filtered repos are:');
-  console.log(filteredRepos);
-  console.log('the filtered language rows are:');
-  console.log(filteredLanguageRows);
   // seed the repos
   await prisma.repository.createMany({
     data: filteredRepos,
   });
+  // !
   console.log(`repos seeded:`);
   const dbRepos = await prisma.repository.findMany();
   console.log(dbRepos);
-  // // shape the languages to fit the prisma model
-
-  // // seed languages
-  /* for (let languageRow of filteredLanguageRows) {
-    await prisma.language.create({
-      data: {
-        repositoryId: languageRow.repositoryId,
-        size: languageRow.size,
-      },
-    });
-  } */
+  // seed languages
+  await prisma.repositoryLanguage.createMany({
+    data: filteredLanguageRows,
+  });
+  console.log(`languages seeded:`);
+  const dbLanguages = await prisma.repositoryLanguage.findMany();
+  console.log(dbLanguages);
 }
 
 main()

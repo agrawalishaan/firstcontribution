@@ -1,11 +1,28 @@
 import constants from '@/lib/constants';
-import getWithAuth from '@/lib/helpers//getWithAuth';
-import trimUrl from '@/lib/helpers/trimUrl';
-import { get } from 'https';
+import getWithAuth from '@/lib/util/getWithAuth';
+import { trimGithubEnding } from '@/lib/util/trimUrl';
+
+export interface Repository {
+  repoId: number;
+  name: string;
+  fullName: string;
+  description: string;
+  url: string;
+  stars: number;
+  forks: number;
+  hasIssues: boolean;
+  updatedAt: string;
+  languagesUrl: string;
+  issuesUrl: string;
+  avatarUrl: string;
+  homepage: string | null;
+}
 
 // gets the top repos from the github API, shapes them, and returns them
 // npm run startrepos
-export default async function getTopReposByStars(pages = 1) {
+export async function getTopReposByStars(
+  pages: number = 1
+): Promise<Repository[]> {
   const promises = [];
   // iterate over each page, grabbing new results, at most 1000 results are allowed by the github api, hence 10 pages of 100 results
   // github api pages start from page 1
@@ -30,9 +47,9 @@ export default async function getTopReposByStars(pages = 1) {
     hasIssues: repo.has_issues,
     updatedAt: repo.updated_at,
     languagesUrl: repo.languages_url,
-    issuesUrl: trimUrl(repo.issues_url),
+    issuesUrl: trimGithubEnding(repo.issues_url),
     avatarUrl: repo.owner.avatar_url,
-    homepage: repo.homepage, // can be blank string, otherwise usually an external website
+    homepage: repo.homepage,
   }));
   // remove repos that are private, or don't have issues
   shapedApiData = shapedApiData.filter((repo) => !repo.private);
@@ -55,5 +72,5 @@ export default async function getTopReposByStars(pages = 1) {
     languages_url: 'https://api.github.com/repos/kamranahmedse/design-patterns-for-humans/languages',
     issues_url: 'https://api.github.com/repos/kamranahmedse/design-patterns-for-humans/issues',
     avatar_url: 'https://avatars.githubusercontent.com/u/4921183?v=4',
-    homepage: ''
+    homepage: null
   }, */

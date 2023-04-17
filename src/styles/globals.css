@@ -1,3 +1,18 @@
+/* font comes from _document.tsx link */
 body {
+  font-family: 'Noto Sans', sans-serif;
   margin: 0;
+}
+
+/* override default usersheet stylings */
+body button {
+  font-family: 'Noto Sans', sans-serif;
+}
+
+.primary-color {
+  color: #474747;
+}
+
+.secondary-color {
+  color: #9E9D9E;
 }

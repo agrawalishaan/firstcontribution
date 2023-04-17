@@ -1,9 +1,5 @@
-.container {
-  background-color: grey;
-  display: flex;
-  min-height: 100vh;
-}
-
 .main {
-  flex: 1;
+  /* background-color: #f3f2ef; */
+  background-color: #fff;
+  min-height: 100vh;
 }

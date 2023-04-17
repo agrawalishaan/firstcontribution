@@ -25,13 +25,13 @@ model Repository {
   languagesUrl       String
   issuesUrl          String
   avatarUrl          String
-  homepage           String
+  homepage           String?
   RepositoryLanguage RepositoryLanguage[]
 }
 
 model RepositoryLanguage {
   id           Int        @id @default(autoincrement())
-  repository   Repository @relation(fields: [repositoryId], references: [id])
+  repository   Repository @relation(fields: [repositoryId], references: [repoId])
   repositoryId Int
   language     String
   percentage   Float
