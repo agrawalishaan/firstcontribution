@@ -1,3 +1,17 @@
+.filter {
+  background-color: transparent;
+  color: #0D0D22;
+}
+
+.filter, .sort {
+  border: 1px solid #E0E0E0;
+  padding: 12px 17px;
+}
+
+.filter, .sort, .view {
+  border-radius: 10px;
+}
+
 .filters {
   align-items: center;
   display: flex;
@@ -6,23 +20,23 @@
   margin-bottom: 40px;
 }
 
-.filter-toggle {
-  background-color: #EFEFEF;
-  border: none;
-  border-radius: 30px;
-  /* set to dimensions of the view buttons */
-  height: 48px;
-  width: 48px;
+.filters > :not(:last-child) {
+  margin-right: 30px;
+}
+
+.sort, .view {
+  color: #72717E;
 }
 
 .view {
   background-color: transparent;
-  border-radius: 15px;
   border: none;
-  color: #72717E;
-  font-weight: 300;
-  margin: 0 20px;
-  padding: 15px;
+  font-weight: 400;
+  padding: 10px 15px;
+}
+
+.view:hover {
+  color: #0D0D22;
 }
 
 .active {
