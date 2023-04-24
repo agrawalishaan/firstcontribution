@@ -1,6 +1,6 @@
 import constants from '@/lib/constants';
 
-import { LanguagePercents } from '@/lib/util/constructLanguageRows';
+import { LanguagePercents } from '@/lib/util/getLanguages';
 
 // this function only returns true if the languages are not empty and contain at least one valid language (as defined by the invalid languages constant)
 // this is needed to ensure we only display repos with at least one real coding language

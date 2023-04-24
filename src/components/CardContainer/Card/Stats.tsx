@@ -5,7 +5,12 @@ import styles from '@/styles/CardContainer/card.module.css';
 
 import cx from '@/lib/util/cx';
 
-export default function StatsSection({ stars, forks }) {
+type Props = {
+  stars: string;
+  forks: string;
+};
+
+export default function StatsSection({ stars, forks }: Props) {
   return (
     <div className={cx(styles.stats, 'secondary-color')}>
       <div className={styles.stat}>

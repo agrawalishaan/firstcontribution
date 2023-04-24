@@ -1,11 +1,11 @@
 // ! use native Repository typing and LanguageRow typing
-import { PrismaClient, Repository } from '@prisma/client';
+import { PrismaClient } from '@prisma/client';
 const prisma = new PrismaClient();
 
 import {
-  constructLanguageRows,
-  processAllRepos,
-} from '@/lib/util/constructLanguageRows';
+  getLanguageRows,
+  getLanguagesPercentsMany,
+} from '@/lib/util/getLanguages';
 import { getTopReposByStars } from '@/lib/util/getTopReposByStars';
 import validateLanguages from '@/lib/util/validateLanguages';
 
@@ -18,23 +18,23 @@ async function main() {
   console.log('all repo languages deleted');
 
   const repos = await getTopReposByStars();
-  // don't fully unroll the repos yet into individual language rows, as we want to filter out repos that don't meet certain language criteria
-  const processedRepos = await processAllRepos(repos);
+  // don't fully unroll the repos yet into individual language rows, as we want to filter out repos that don't meet certain language criteria, and it is hard to do that with just language rows
+  const languagesPercents = await getLanguagesPercentsMany(repos);
   const validIds = new Set();
-  processedRepos.forEach((repo) => {
+  languagesPercents.forEach((repo) => {
     if (validateLanguages(repo.languages)) {
       validIds.add(repo.repositoryId);
     }
   });
-  // now build the prisma language rows and filter the repos and language rows
-  const languageRows = await constructLanguageRows(processedRepos);
-  const filteredRepos = repos.filter((repo) => validIds.has(repo.repoId));
-  const filteredLanguageRows = languageRows.filter((languageInfo) =>
-    validIds.has(languageInfo.repositoryId)
+  // now build the rows with the filtered data
+  const languagesPercentsFiltered = languagesPercents.filter((repo) =>
+    validIds.has(repo.repositoryId)
   );
+  const languageRowsFiltered = await getLanguageRows(languagesPercentsFiltered);
+  const reposFiltered = repos.filter((repo) => validIds.has(repo.repoId));
   // seed the repos
   await prisma.repository.createMany({
-    data: filteredRepos,
+    data: reposFiltered,
   });
   // !
   console.log(`repos seeded:`);
@@ -42,7 +42,7 @@ async function main() {
   console.log(dbRepos);
   // seed languages
   await prisma.repositoryLanguage.createMany({
-    data: filteredLanguageRows,
+    data: languageRowsFiltered,
   });
   console.log(`languages seeded:`);
   const dbLanguages = await prisma.repositoryLanguage.findMany();

@@ -6,9 +6,10 @@ import styles from '@/styles/layout.module.css';
 
 type Props = {
   children: ReactNode;
+  title: string;
 };
 
-export default function Layout({ children, title }) {
+export default function Layout({ children, title }: Props) {
   return (
     <div>
       <Head>

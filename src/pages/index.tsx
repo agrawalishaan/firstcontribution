@@ -43,9 +43,12 @@ export default function HomePage() {
     [view]
   );
 
-  const handleSortChange = useCallback((e) => {
-    setSort(e.target.value);
-  }, []);
+  const handleSortChange = useCallback(
+    (e: React.ChangeEvent<HTMLInputElement>) => {
+      setSort(e.target.value);
+    },
+    []
+  );
 
   return (
     <Layout title="First Contribution">

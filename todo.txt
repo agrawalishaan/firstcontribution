@@ -4,3 +4,4 @@
 4) make filter menu
 5) restyle header
 7) make filtering work
+8) add error handling for if the shape of the api response doesnt match up

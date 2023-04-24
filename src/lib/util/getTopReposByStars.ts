@@ -1,28 +1,36 @@
+import { Repository } from '@prisma/client';
+
 import constants from '@/lib/constants';
 import getWithAuth from '@/lib/util/getWithAuth';
 import { trimGithubEnding } from '@/lib/util/trimUrl';
 
-export interface Repository {
-  repoId: number;
+export type RepositoryShaped = Omit<Repository, 'id'>;
+
+interface RepositoryResponse {
+  id: number; // refers to the unique repository ID not our prisma ID
   name: string;
-  fullName: string;
+  full_name: string;
+  private: boolean;
   description: string;
-  url: string;
-  stars: number;
-  forks: number;
-  hasIssues: boolean;
-  updatedAt: string;
-  languagesUrl: string;
-  issuesUrl: string;
-  avatarUrl: string;
-  homepage: string | null;
+  html_url: string;
+  stargazers_count: number;
+  forks_count: number;
+  has_issues: boolean;
+  updated_at: Date;
+  languages_url: string;
+  issues_url: string;
+  owner: {
+    avatar_url: string;
+  };
+  homepage: string;
 }
 
+// ! todo: add error handling for if the api changes or a parameter does not fit
 // gets the top repos from the github API, shapes them, and returns them
 // npm run startrepos
 export async function getTopReposByStars(
-  pages: number = 1
-): Promise<Repository[]> {
+  pages = 1
+): Promise<RepositoryShaped[]> {
   const promises = [];
   // iterate over each page, grabbing new results, at most 1000 results are allowed by the github api, hence 10 pages of 100 results
   // github api pages start from page 1
@@ -35,42 +43,26 @@ export async function getTopReposByStars(
   // retrieve data and flatten the array due to querying by page
   apiData = apiData.map((repo) => repo.data.items).flat();
   // shape api data to fit the prisma model
-  let shapedApiData = apiData.map((repo) => ({
-    repoId: repo.id,
-    name: repo.name,
-    fullName: repo.full_name,
-    private: repo.private,
-    description: repo.description,
-    url: repo.html_url,
-    stars: repo.stargazers_count,
-    forks: repo.forks_count,
-    hasIssues: repo.has_issues,
-    updatedAt: repo.updated_at,
-    languagesUrl: repo.languages_url,
-    issuesUrl: trimGithubEnding(repo.issues_url),
-    avatarUrl: repo.owner.avatar_url,
-    homepage: repo.homepage,
-  }));
-  // remove repos that are private, or don't have issues
-  shapedApiData = shapedApiData.filter((repo) => !repo.private);
-  shapedApiData = shapedApiData.filter((repo) => repo.hasIssues);
-  return shapedApiData;
+  let apiDataShaped: RepositoryShaped[] = apiData.map(
+    (repo: RepositoryResponse) => ({
+      repoId: repo.id,
+      name: repo.name,
+      fullName: repo.full_name,
+      private: repo.private,
+      description: repo.description,
+      url: repo.html_url,
+      stars: repo.stargazers_count,
+      forks: repo.forks_count,
+      hasIssues: repo.has_issues,
+      updatedAt: repo.updated_at,
+      languagesUrl: repo.languages_url,
+      issuesUrl: trimGithubEnding(repo.issues_url),
+      avatarUrl: repo.owner.avatar_url,
+      homepage: repo.homepage,
+    })
+  );
+  // remove repos that are private or don't have issues
+  return apiDataShaped
+    .filter((repo) => !repo.private)
+    .filter((repo) => repo.hasIssues);
 }
-
-// example
-/* {
-    id: 82227585,
-    name: 'design-patterns-for-humans',
-    full_name: 'kamranahmedse/design-patterns-for-humans',
-    private: false,
-    description: 'An ultra-simplified explanation to design patterns',
-    url: 'https://github.com/kamranahmedse/design-patterns-for-humans',
-    stars: 40118,
-    forks: 4781,
-    has_issues: true,
-    updated_at: '2023-03-31T20:26:15Z',
-    languages_url: 'https://api.github.com/repos/kamranahmedse/design-patterns-for-humans/languages',
-    issues_url: 'https://api.github.com/repos/kamranahmedse/design-patterns-for-humans/issues',
-    avatar_url: 'https://avatars.githubusercontent.com/u/4921183?v=4',
-    homepage: null
-  }, */

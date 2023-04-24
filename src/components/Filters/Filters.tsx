@@ -5,12 +5,19 @@ import cx from '@/lib/util/cx';
 
 import styles from '@/styles/Filters/filters.module.css';
 
+type Props = {
+  view: string;
+  handleViewChange: (view: string) => void;
+  handleSortChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
+  sort: string;
+};
+
 export default function Filters({
   view,
   handleViewChange,
   handleSortChange,
   sort,
-}) {
+}: Props) {
   return (
     <div className={styles.filters}>
       <button
