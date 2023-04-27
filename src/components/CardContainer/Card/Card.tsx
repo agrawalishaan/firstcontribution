@@ -7,10 +7,18 @@ import roundCount from '@/lib/util/roundCount';
 
 import styles from '@/styles/CardContainer/card.module.css';
 
-export default function Card({ repoData }) {
+import { RepositoryExtended } from '@/lib/typings';
+
+type Props = {
+  repoData: RepositoryExtended;
+};
+
+export default function Card({ repoData }: Props) {
   return (
     <div className={styles['card-boundary']}>
       <div className={styles.card}>
+        {JSON.stringify(repoData.languages)}
+        {JSON.stringify(repoData.issues)}
         <Heading
           name={repoData.name}
           avatarUrl={repoData.avatarUrl}

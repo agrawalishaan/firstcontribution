@@ -1,7 +1,5 @@
 import Issue from '@/components/CardContainer/Card/Issue';
 
-import cx from '@/lib/util/cx';
-
 import styles from '@/styles/CardContainer/card.module.css';
 
 export default function IssuesSection() {

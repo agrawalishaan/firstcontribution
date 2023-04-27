@@ -8,7 +8,7 @@
     "start": "next start",
     "lint": "next lint",
     "startrepos": "nodemon src/lib/helpers/getTopReposByStars.ts --ext '*' --exec babel-node --extensions '.js,.ts'",
-    "startdb": "nodemon src/lib/db/index.ts --ext '*' --exec babel-node --extensions '.js,.ts'",
+    "startdb": "nodemon src/lib/db/seed.ts --ext '*' --exec babel-node --extensions '.js,.ts'",
     "generateclient": "prisma generate",
     "migrate": "prisma migrate dev --name init",
     "test": "nodemon src/lib/helpers/testRequests.ts --ext '*' --exec babel-node --extensions '.js,.ts'"

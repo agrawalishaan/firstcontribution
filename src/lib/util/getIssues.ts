@@ -1,11 +1,15 @@
+import { Issue } from '@prisma/client';
+
 import getWithAuth from '@/lib/util/getWithAuth';
 import validateLabels from '@/lib/util/validateLabels';
+import { RepositoryInput } from '@/lib/util/getTopReposByStars';
 
-import { RepositoryShaped } from '@/lib/util/getTopReposByStars';
-
+type IssueInput = Omit<Issue, 'id'>;
 // ! add native typings
 
-export default async function getIssueRowsMany(repos: RepositoryShaped[]) {
+export default async function getIssueRowsMany(
+  repos: RepositoryInput[]
+): Promise<IssueInput[]> {
   const issueRowsMany = [];
   for (let repo of repos) {
     issueRowsMany.push(getIssueRows(repo));
@@ -20,7 +24,7 @@ const STATE = 'open'; // only want open issues
 
 // iterates over multiple API calls to get all issue rows for a given repo
 // example call: https://api.github.com/repos/vercel/next.js/issues?per_page=100&state=open&page=1
-async function getIssueRows(repo: RepositoryShaped) {
+async function getIssueRows(repo: RepositoryInput): Promise<IssueInput[]> {
   const baseUrl = `${repo.issuesUrl}?per_page=${PER_PAGE}&state=${STATE}`;
   const numPages = Math.ceil(repo.openIssues / PER_PAGE);
   const promises = [];
@@ -30,7 +34,7 @@ async function getIssueRows(repo: RepositoryShaped) {
   const issuesAll = await Promise.all(promises);
   const issuesAllFlat = issuesAll.map((issues) => issues.data).flat();
   // !
-  const issuesAllShaped = issuesAllFlat.map((issue) => ({
+  const issuesAllShaped: IssueInput[] = issuesAllFlat.map((issue) => ({
     repositoryId: repo.repoId,
     issueId: issue.id,
     issueNumber: issue.number,

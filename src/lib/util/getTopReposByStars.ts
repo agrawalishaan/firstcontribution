@@ -4,7 +4,7 @@ import constants from '@/lib/constants';
 import getWithAuth from '@/lib/util/getWithAuth';
 import { trimGithubEnding } from '@/lib/util/trimUrl';
 
-export type RepositoryShaped = Omit<Repository, 'id'>;
+export type RepositoryInput = Omit<Repository, 'id'>;
 
 // ! add error handling for all API calls if the data doesn't fit a shape
 
@@ -33,7 +33,7 @@ interface RepositoryResponse {
 // npm run startrepos
 export default async function getTopReposByStars(
   pages = 1
-): Promise<RepositoryShaped[]> {
+): Promise<RepositoryInput[]> {
   const promises = [];
   // iterate over each page, grabbing new results, at most 1000 results are allowed by the github api, hence 10 pages of 100 results
   // github api pages start from page 1
@@ -46,7 +46,7 @@ export default async function getTopReposByStars(
   // retrieve data and flatten the array due to querying by page
   apiData = apiData.map((repo) => repo.data.items).flat();
   // shape api data to fit the prisma model
-  let apiDataShaped: RepositoryShaped[] = apiData.map(
+  let apiDataShaped: RepositoryInput[] = apiData.map(
     (repo: RepositoryResponse) => ({
       repoId: repo.id,
       name: repo.name,

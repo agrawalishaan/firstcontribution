@@ -49,27 +49,3 @@ model Issue {
   labels       Boolean
   pullRequest  Boolean
 }
-
- // useEffects
-  useEffect(() => {
-    async function getData() {
-      const repos = axios.get('/api/get-repos');
-      // const issues = axios.get('/api/get-issues');
-      const data = await Promise.all([repos]);
-      // const data = await Promise.all([repos, issues]);
-      setReposData(data[0].data);
-      // setIssuesData(data[1].data);
-    }
-    getData();
-  });
-
-    useEffect(() => {
-    axios
-      .get('/api/get-repos')
-      .then((res) => {
-        setReposData(res.data);
-      })
-      .catch((e) => {
-        console.error(e);
-      });
-  }, []);

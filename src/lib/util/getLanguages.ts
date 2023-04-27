@@ -1,8 +1,11 @@
-import getWithAuth from '@/lib/util/getWithAuth';
+import { RepositoryLanguage } from '@prisma/client';
 
-import { RepositoryShaped } from '@/lib/util/getTopReposByStars';
+import getWithAuth from '@/lib/util/getWithAuth';
+import { RepositoryInput } from '@/lib/util/getTopReposByStars';
 
 // getLanguageRows will construct rows for all repos, even ones that don't yet have valid languages, but the inefficiency is smaller and allows for better future extensibility or code re-use
+
+type LanguageInput = Omit<RepositoryLanguage, 'id'>;
 
 // { javascript: 456, html: 123 }
 interface LanguageBytes {
@@ -18,16 +21,10 @@ interface languageResponseWithPercents {
   languages: LanguagePercents;
 }
 
-interface LanguageRow {
-  repositoryId: number;
-  language: string;
-  percentage: number;
-}
-
 //constructs language rows from the repos
 export default async function getLanguageRows(
-  repos: RepositoryShaped[]
-): Promise<LanguageRow[]> {
+  repos: RepositoryInput[]
+): Promise<LanguageInput[]> {
   const promises = repos.map((repo) => getLanguagePercents(repo));
   const responses = await Promise.all(promises);
   const languageRows = [];
@@ -45,7 +42,7 @@ export default async function getLanguageRows(
 
 // gets the language response for a single repo and adds in percentage data
 async function getLanguagePercents(
-  repo: RepositoryShaped
+  repo: RepositoryInput
 ): Promise<languageResponseWithPercents> {
   const languageResponse = await getWithAuth(repo.languagesUrl);
   const percentagesMapping = calculatePercentages(languageResponse.data);

@@ -2,7 +2,13 @@ import cx from '@/lib/util/cx';
 
 import styles from '@/styles/CardContainer/card.module.css';
 
-export default function CardHeader({ name, avatarUrl, description }) {
+type Props = {
+  name: string;
+  avatarUrl: string;
+  description: string;
+};
+
+export default function CardHeader({ name, avatarUrl, description }: Props) {
   return (
     <div className={styles.heading}>
       <div className={styles['heading-top']}>

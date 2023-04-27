@@ -7,6 +7,8 @@ import Filters from '@/components/Filters/Filters';
 import Infobar from '@/components/Infobar/Infobar';
 import Layout from '@/components/Layout/Layout';
 
+import { RepositoryExtended } from '@/lib/typings';
+
 export default function HomePage() {
   // useStates
 
@@ -15,23 +17,22 @@ export default function HomePage() {
   // contains current sort type
   const [sort, setSort] = useState('sort-by');
   // contains all repo information
-  const [reposData, setReposData] = useState(null);
-  // contains all issue information
-  const [issuesData, setIssuesData] = useState(null);
+  const [repos, setRepos] = useState<RepositoryExtended[] | null>(null);
 
+  // ! add typings to returned data from api calls
   // useEffects
   useEffect(() => {
     async function getData() {
-      const repos = axios.get('/api/get-repos');
-      const issues = axios.get('/api/get-issues');
-      const data = await Promise.all([repos, issues]);
-      setReposData(data[0].data);
-      setIssuesData(data[1].data);
+      // ! add a type annotation for axios but why do I even need to
+      const reposNested = (await axios.get('/api/get-repos')).data;
+      setRepos(reposNested);
     }
     getData();
   }, []);
 
   // useCallbacks
+
+  // handles which types of repositories are being viewed, top repos or community repos
   // ! make it so when you click on a button already clicked nothing happens
   const handleViewChange = useCallback(
     (clickedButton: string) => {
@@ -44,6 +45,7 @@ export default function HomePage() {
     [view]
   );
 
+  // handles the state change for the `sort by` dropdown
   const handleSortChange = useCallback(
     (e: React.ChangeEvent<HTMLInputElement>) => {
       setSort(e.target.value);
@@ -54,14 +56,13 @@ export default function HomePage() {
   return (
     <Layout title="First Contribution">
       <Infobar />
-      {JSON.stringify(issuesData)}
       <Filters
         view={view}
         handleViewChange={handleViewChange}
         handleSortChange={handleSortChange}
         sort={sort}
       />
-      <div>{reposData && <CardContainer reposData={reposData} />}</div>
+      <div>{repos && <CardContainer repos={repos} />}</div>
     </Layout>
   );
 }

@@ -8,7 +8,7 @@ import styles from '@/styles/Filters/filters.module.css';
 type Props = {
   view: string;
   handleViewChange: (view: string) => void;
-  handleSortChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
+  handleSortChange: (e: React.ChangeEvent<HTMLSelectElement>) => void;
   sort: string;
 };
 
