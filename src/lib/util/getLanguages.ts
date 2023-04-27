@@ -2,13 +2,14 @@ import getWithAuth from '@/lib/util/getWithAuth';
 
 import { RepositoryShaped } from '@/lib/util/getTopReposByStars';
 
+// getLanguageRows will construct rows for all repos, even ones that don't yet have valid languages, but the inefficiency is smaller and allows for better future extensibility or code re-use
+
 // { javascript: 456, html: 123 }
 interface LanguageBytes {
   [key: string]: number;
 }
-
 // { javascript: 83.33, html: 16.66 }
-export interface LanguagePercents {
+interface LanguagePercents {
   [key: string]: number;
 }
 
@@ -23,32 +24,23 @@ interface LanguageRow {
   percentage: number;
 }
 
-// This module takes in a list of shaped repositories, and returns the rows for their languages. Two functions are exported because we need to filter repos that don't have a valid language, but it's harder to do it once the languages are divided out into individual rows
-
-//constructs language rows from the responses with percents
-export async function getLanguageRows(
-  responsesWithPercents: languageResponseWithPercents[]
+//constructs language rows from the repos
+export default async function getLanguageRows(
+  repos: RepositoryShaped[]
 ): Promise<LanguageRow[]> {
+  const promises = repos.map((repo) => getLanguagePercents(repo));
+  const responses = await Promise.all(promises);
   const languageRows = [];
-  for (let repo of responsesWithPercents) {
-    for (let language in repo.languages) {
+  for (let response of responses) {
+    for (let language in response.languages) {
       languageRows.push({
-        repositoryId: repo.repositoryId,
+        repositoryId: response.repositoryId,
         language: language,
-        percentage: repo.languages[language],
+        percentage: response.languages[language],
       });
     }
   }
   return languageRows;
-}
-
-// gets for all repos
-export async function getLanguagesPercentsMany(
-  repos: RepositoryShaped[]
-): Promise<languageResponseWithPercents[]> {
-  const promises = repos.map((repo) => getLanguagePercents(repo));
-  const responses = await Promise.all(promises);
-  return responses;
 }
 
 // gets the language response for a single repo and adds in percentage data

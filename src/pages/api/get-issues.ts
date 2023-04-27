@@ -6,6 +6,6 @@ export default async function handler(
   req: NextApiRequest,
   res: NextApiResponse
 ) {
-  const allRepoData = await prisma.repository.findMany();
+  const allRepoData = await prisma.issue.findMany();
   res.status(200).json(allRepoData);
 }

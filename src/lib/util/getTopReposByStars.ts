@@ -6,6 +6,8 @@ import { trimGithubEnding } from '@/lib/util/trimUrl';
 
 export type RepositoryShaped = Omit<Repository, 'id'>;
 
+// ! add error handling for all API calls if the data doesn't fit a shape
+
 interface RepositoryResponse {
   id: number; // refers to the unique repository ID not our prisma ID
   name: string;
@@ -16,6 +18,7 @@ interface RepositoryResponse {
   stargazers_count: number;
   forks_count: number;
   has_issues: boolean;
+  open_issues_count: number;
   updated_at: Date;
   languages_url: string;
   issues_url: string;
@@ -28,13 +31,13 @@ interface RepositoryResponse {
 // ! todo: add error handling for if the api changes or a parameter does not fit
 // gets the top repos from the github API, shapes them, and returns them
 // npm run startrepos
-export async function getTopReposByStars(
+export default async function getTopReposByStars(
   pages = 1
 ): Promise<RepositoryShaped[]> {
   const promises = [];
   // iterate over each page, grabbing new results, at most 1000 results are allowed by the github api, hence 10 pages of 100 results
   // github api pages start from page 1
-  for (let i = 1; i <= +pages; i++) {
+  for (let i = 1; i <= pages; i++) {
     const url = `${constants.TOP_REPOS_BY_STARS_ENDPOINT}&page=${i}`;
     const promise = getWithAuth(url);
     promises.push(promise);
@@ -54,6 +57,7 @@ export async function getTopReposByStars(
       stars: repo.stargazers_count,
       forks: repo.forks_count,
       hasIssues: repo.has_issues,
+      openIssues: repo.open_issues_count,
       updatedAt: repo.updated_at,
       languagesUrl: repo.languages_url,
       issuesUrl: trimGithubEnding(repo.issues_url),

@@ -16,18 +16,19 @@ export default function HomePage() {
   const [sort, setSort] = useState('sort-by');
   // contains all repo information
   const [reposData, setReposData] = useState(null);
+  // contains all issue information
+  const [issuesData, setIssuesData] = useState(null);
 
   // useEffects
-
   useEffect(() => {
-    axios
-      .get('/api/get-repos')
-      .then((res) => {
-        setReposData(res.data);
-      })
-      .catch((e) => {
-        console.error(e);
-      });
+    async function getData() {
+      const repos = axios.get('/api/get-repos');
+      const issues = axios.get('/api/get-issues');
+      const data = await Promise.all([repos, issues]);
+      setReposData(data[0].data);
+      setIssuesData(data[1].data);
+    }
+    getData();
   }, []);
 
   // useCallbacks
@@ -53,6 +54,7 @@ export default function HomePage() {
   return (
     <Layout title="First Contribution">
       <Infobar />
+      {JSON.stringify(issuesData)}
       <Filters
         view={view}
         handleViewChange={handleViewChange}

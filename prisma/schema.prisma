@@ -21,12 +21,14 @@ model Repository {
   stars              Int
   forks              Int
   hasIssues          Boolean
+  openIssues         Int
   updatedAt          DateTime
   languagesUrl       String
   issuesUrl          String
   avatarUrl          String
   homepage           String?
   RepositoryLanguage RepositoryLanguage[]
+  Issue              Issue[]
 }
 
 model RepositoryLanguage {
@@ -36,3 +38,38 @@ model RepositoryLanguage {
   language     String
   percentage   Float
 }
+
+model Issue {
+  id           Int        @id @default(autoincrement())
+  repository   Repository @relation(fields: [repositoryId], references: [repoId])
+  repositoryId Int
+  issueId      Int
+  issueNumber  Int
+  title        String
+  labels       Boolean
+  pullRequest  Boolean
+}
+
+ // useEffects
+  useEffect(() => {
+    async function getData() {
+      const repos = axios.get('/api/get-repos');
+      // const issues = axios.get('/api/get-issues');
+      const data = await Promise.all([repos]);
+      // const data = await Promise.all([repos, issues]);
+      setReposData(data[0].data);
+      // setIssuesData(data[1].data);
+    }
+    getData();
+  });
+
+    useEffect(() => {
+    axios
+      .get('/api/get-repos')
+      .then((res) => {
+        setReposData(res.data);
+      })
+      .catch((e) => {
+        console.error(e);
+      });
+  }, []);
